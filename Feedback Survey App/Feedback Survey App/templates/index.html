@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share Your Feedback</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --cream: #f5f0e8;
+    --accent: #c8783a;
+    --accent2: #2d6a4f;
+    --muted: #8a8078;
+    --card: #ffffff;
+    --border: #e8e2d9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%; right: -20%;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(200,120,58,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -30%; left: -10%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(45,106,79,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ── Navbar ── */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background: rgba(245,240,232,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .nav-logo em { color: var(--accent); font-style: italic; }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .user-avatar {
+    width: 24px; height: 24px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .nav-link {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--accent2);
+    text-decoration: none;
+    padding: 0.35rem 0.8rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+  .nav-link:hover { background: rgba(45,106,79,0.08); }
+
+  .btn-logout {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #c0392b;
+    background: rgba(192,57,43,0.08);
+    border: none;
+    border-radius: 8px;
+    padding: 0.35rem 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .btn-logout:hover { background: rgba(192,57,43,0.15); }
+
+  /* ── Main content ── */
+  .main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 3rem 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .wrapper { width: 100%; max-width: 580px; }
+
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .header .eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .header h1 em { font-style: italic; color: var(--accent); }
+  .header p { color: var(--muted); font-size: 0.95rem; margin-top: 0.75rem; font-weight: 300; }
+
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 60px rgba(26,26,46,0.08), 0 1px 3px rgba(26,26,46,0.05);
+  }
+
+  .form-group { margin-bottom: 1.5rem; }
+
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+
+  select, textarea {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    background: #fdfcfa;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(200,120,58,0.1);
+  }
+  textarea { resize: vertical; min-height: 100px; }
+
+  /* Star Rating */
+  .star-group { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 0.4rem; }
+  .star-group input { display: none; }
+  .star-group label {
+    font-size: 2rem;
+    cursor: pointer;
+    color: #ddd;
+    transition: color 0.15s, transform 0.15s;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .star-group input:checked ~ label,
+  .star-group label:hover,
+  .star-group label:hover ~ label { color: var(--accent); }
+  .star-group label:hover { transform: scale(1.2); }
+
+  /* Recommend pills */
+  .pill-group { display: flex; gap: 0.6rem; }
+  .pill-group input { display: none; }
+  .pill-group label {
+    padding: 0.5rem 1.2rem;
+    border: 1.5px solid var(--border);
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .pill-group input:checked + label {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .pill-group label:hover { border-color: var(--accent); color: var(--accent); }
+
+  .divider { height: 1px; background: #f0ebe3; margin: 1.5rem 0; }
+
+  .btn-submit {
+    width: 100%;
+    padding: 1rem;
+    background: var(--ink);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.03em;
+  }
+  .btn-submit:hover { background: var(--accent); transform: translateY(-1px); }
+  .btn-submit:active { transform: translateY(0); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--ink);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 100;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { background: var(--accent2); }
+  .toast.error { background: #c0392b; }
+
+  @media (max-width: 500px) {
+    .header h1 { font-size: 2rem; }
+    .nav-right .user-chip .user-name { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Feed<em>back</em></div>
+  <div class="nav-right">
+    <div class="user-chip">
+      <div class="user-avatar">{{ user_name[0].upper() }}</div>
+      <span class="user-name">{{ user_name }}</span>
+    </div>
+    <a href="/dashboard" class="nav-link">📊 Dashboard</a>
+    <a href="/logout" class="btn-logout">Sign Out</a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="wrapper">
+    <div class="header">
+      <div class="eyebrow">Your voice matters</div>
+      <h1>Share Your <em>Thoughts</em></h1>
+      <p>Help us improve by sharing your honest feedback</p>
+    </div>
+
+    <div class="card">
+      <form id="feedbackForm">
+        <div class="form-group">
+          <label>Overall Rating</label>
+          <div class="star-group">
+            <input type="radio" name="rating" id="s5" value="5"><label for="s5">★</label>
+            <input type="radio" name="rating" id="s4" value="4"><label for="s4">★</label>
+            <input type="radio" name="rating" id="s3" value="3"><label for="s3">★</label>
+            <input type="radio" name="rating" id="s2" value="2"><label for="s2">★</label>
+            <input type="radio" name="rating" id="s1" value="1"><label for="s1">★</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+          <select name="category">
+            <option value="">Select a topic...</option>
+            <option value="Product">Product</option>
+            <option value="Support">Customer Support</option>
+            <option value="Design">Design & UX</option>
+            <option value="Performance">Performance</option>
+            <option value="Pricing">Pricing</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Your Message</label>
+          <textarea name="message" placeholder="Tell us what you think..."></textarea>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="form-group">
+          <label>Would you recommend us?</label>
+          <div class="pill-group">
+            <input type="radio" name="recommend" id="rYes" value="Yes"><label for="rYes">👍 Yes</label>
+            <input type="radio" name="recommend" id="rMaybe" value="Maybe"><label for="rMaybe">🤷 Maybe</label>
+            <input type="radio" name="recommend" id="rNo" value="No"><label for="rNo">👎 No</label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Submit Feedback →</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const form = document.getElementById('feedbackForm');
+  const toast = document.getElementById('toast');
+
+  function showToast(msg, type = 'success') {
+    toast.textContent = msg;
+    toast.className = `toast ${type} show`;
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form));
+    data.rating = parseInt(data.rating) || 0;
+
+    try {
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if (result.success) {
+        showToast('✓ Feedback submitted! Thank you.', 'success');
+        form.reset();
+      } else {
+        showToast(result.message || 'Failed to submit feedback.', 'error');
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      showToast('Something went wrong. Try again.', 'error');
+    }
+  });
+</script>
+</body>
+</html>

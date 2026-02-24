@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FeedbackApp — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d14;
+    --surface: #16161f;
+    --surface2: #1e1e2a;
+    --border: #2a2a3a;
+    --accent: #ff6b35;
+    --accent2: #4ecdc4;
+    --text: #e8e6f0;
+    --muted: #6b6880;
+    --error: #ff4757;
+    --success: #2ed573;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Animated background blobs */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    animation: float 8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .blob1 { width: 400px; height: 400px; background: var(--accent); top: -100px; right: -100px; animation-delay: 0s; }
+  .blob2 { width: 300px; height: 300px; background: var(--accent2); bottom: -80px; left: -80px; animation-delay: -4s; }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(20px, -20px) scale(1.05); }
+  }
+
+  .container {
+    width: 100%;
+    max-width: 440px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Logo */
+  .logo {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.03em;
+  }
+  .logo-text span { color: var(--accent); }
+  .logo-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+  }
+
+  /* Tab switcher */
+  .tab-bar {
+    display: flex;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 1.5rem;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 0.65rem;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .tab-btn.active {
+    background: var(--accent);
+    color: white;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  /* Form panels */
+  .form-panel { display: none; }
+  .form-panel.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.3rem;
+    letter-spacing: -0.02em;
+  }
+  .panel-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group { margin-bottom: 1.1rem; }
+
+  label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 0.45rem;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input::placeholder { color: var(--muted); opacity: 0.6; }
+  input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+  }
+  input.error { border-color: var(--error); }
+  input.ok { border-color: var(--success); }
+
+  .password-wrap { position: relative; }
+  .toggle-pw {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+    line-height: 1;
+  }
+  .toggle-pw:hover { color: var(--text); }
+
+  .strength-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 3px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  .strength-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s, background 0.3s;
+    width: 0%;
+  }
+
+  .alert {
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    display: none;
+    animation: fadeIn 0.2s ease;
+  }
+  .alert.error { background: rgba(255,71,87,0.12); color: var(--error); border: 1px solid rgba(255,71,87,0.2); display: block; }
+  .alert.success { background: rgba(46,213,115,0.12); color: var(--success); border: 1px solid rgba(46,213,115,0.2); display: block; }
+
+  .btn-primary {
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    margin-top: 0.5rem;
+    position: relative;
+  }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .divider {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin: 1.2rem 0;
+    position: relative;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 38%;
+    height: 1px;
+    background: var(--border);
+  }
+  .divider::before { left: 0; }
+  .divider::after { right: 0; }
+</style>
+</head>
+<body>
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+
+<div class="container">
+  <div class="logo">
+    <div class="logo-text">Feed<span>back</span></div>
+    <div class="logo-sub">Share your voice. Shape the future.</div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+    <button class="tab-btn" onclick="switchTab('signup')">Create Account</button>
+  </div>
+
+  <div class="card">
+    <!-- LOGIN PANEL -->
+    <div class="form-panel active" id="loginPanel">
+      <div class="panel-title">Welcome back 👋</div>
+      <div class="panel-sub">Sign in to your account to continue</div>
+
+      <div id="loginAlert" class="alert"></div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="password-wrap">
+          <input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password">
+          <button class="toggle-pw" onclick="togglePw('loginPassword', this)" type="button">👁</button>
+        </div>
+      </div>
+      <button class="btn-primary" id="loginBtn" onclick="doLogin()">Sign In →</button>
+    </div>
+
+    <!-- SIGNUP PANEL -->
+    <div class="form-panel" id="signupPanel">
+      <div class="panel-title">Create account ✨</div>
+      <div class="panel-sub">Join us and start sharing feedback</div>
+
+      <div id="signupAlert" class="alert"></div>
+
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="signupName" placeholder="Jane Doe" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="password-wrap">
+          <input type="password" id="signupPassword" placeholder="Min. 6 characters" oninput="checkStrength(this.value)" autocomplete="new-password">
+          <button class="toggle-pw" onclick="togglePw('signupPassword', this)" type="button">👁</button>
+        </div>
+        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <div class="password-wrap">
+          <input type="password" id="signupConfirm" placeholder="Repeat your password" oninput="checkMatch()" autocomplete="new-password">
+          <button class="toggle-pw" onclick="togglePw('signupConfirm', this)" type="button">👁</button>
+        </div>
+      </div>
+      <button class="btn-primary" id="signupBtn" onclick="doSignup()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Tab switching ────────────────────────────────────────────────────────────
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+      b.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'signup'));
+    });
+    document.getElementById('loginPanel').classList.toggle('active', tab === 'login');
+    document.getElementById('signupPanel').classList.toggle('active', tab === 'signup');
+    clearAlerts();
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+  function togglePw(id, btn) {
+    const inp = document.getElementById(id);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+  }
+
+  function showAlert(id, msg, type) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = `alert ${type}`;
+  }
+
+  function clearAlerts() {
+    ['loginAlert', 'signupAlert'].forEach(id => {
+      const el = document.getElementById(id);
+      el.className = 'alert';
+      el.textContent = '';
+    });
+  }
+
+  function setLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = loading;
+    if (loading) {
+      btn.innerHTML = '<span class="spinner"></span> Please wait...';
+    } else {
+      btn.innerHTML = btn.id === 'loginBtn' ? 'Sign In →' : 'Create Account →';
+    }
+  }
+
+  // ── Password strength ────────────────────────────────────────────────────────
+  function checkStrength(pw) {
+    let score = 0;
+    if (pw.length >= 6) score++;
+    if (pw.length >= 10) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    const fill = document.getElementById('strengthFill');
+    const colors = ['#ff4757', '#ff6b35', '#ffd166', '#2ed573', '#2ed573'];
+    fill.style.width = (score * 20) + '%';
+    fill.style.background = colors[score - 1] || '#ff4757';
+  }
+
+  function checkMatch() {
+    const pw = document.getElementById('signupPassword').value;
+    const cf = document.getElementById('signupConfirm');
+    cf.classList.toggle('ok', cf.value === pw && pw.length > 0);
+    cf.classList.toggle('error', cf.value !== pw && cf.value.length > 0);
+  }
+
+  // ── Login ────────────────────────────────────────────────────────────────────
+  async function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    if (!email || !password) {
+      showAlert('loginAlert', '⚠ Please fill in all fields.', 'error');
+      return;
+    }
+
+    setLoading('loginBtn', true);
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showAlert('loginAlert', '✓ Login successful! Redirecting...', 'success');
+        setTimeout(() => window.location.href = data.redirect, 600);
+      } else {
+        showAlert('loginAlert', '✗ ' + data.message, 'error');
+        setLoading('loginBtn', false);
+      }
+    } catch {
+      showAlert('loginAlert', '✗ Server error. Try again.', 'error');
+      setLoading('loginBtn', false);
+    }
+  }
+
+  // ── Signup ───────────────────────────────────────────────────────────────────
+  async function doSignup() {
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const confirm_password = document.getElementById('signupConfirm').value;
+
+    if (!name || !email || !password || !confirm_password) {
+      showAlert('signupAlert', '⚠ Please fill in all fields.', 'error');
+      return;
+    }
+    if (password !== confirm_password) {
+      showAlert('signupAlert', '✗ Passwords do not match.', 'error');
+      return;
+    }
+
+    setLoading('signupBtn', true);
+    try {
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, confirm_password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showAlert('signupAlert', '✓ Account created! Redirecting...', 'success');
+        setTimeout(() => window.location.href = data.redirect, 600);
+      } else {
+        showAlert('signupAlert', '✗ ' + data.message, 'error');
+        setLoading('signupBtn', false);
+      }
+    } catch {
+      showAlert('signupAlert', '✗ Server error. Try again.', 'error');
+      setLoading('signupBtn', false);
+    }
+  }
+
+  // Enter key support
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (document.getElementById('loginPanel').classList.contains('active')) doLogin();
+      else doSignup();
+    }
+  });
+</script>
+</body>
+</html>
