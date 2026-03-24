@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appraisal Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f5f7fa;
+    min-height: 100vh;
+  }
+
+  nav {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav-logo { 
+    font-size: 1.5rem; 
+    font-weight: 700; 
+    color: white;
+  }
+  
+  .nav-right { display: flex; gap: 1rem; align-items: center; }
+  
+  .nav-link {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+  .nav-link:hover { background: rgba(255,255,255,0.1); }
+
+  .container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .back-link {
+    color: #667eea;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+  }
+
+  .section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 1.5rem;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e0e0e0;
+  }
+
+  h2 {
+    color: #2c3e50;
+    font-size: 1.5rem;
+  }
+
+  .status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .status-pending { background: #ffeaa7; color: #d63031; }
+  .status-in_progress { background: #74b9ff; color: #0984e3; }
+  .status-approved { background: #55efc4; color: #00b894; }
+  .status-rejected { background: #ff7675; color: #d63031; }
+  .status-not_started { background: #dfe6e9; color: #636e72; }
+  .status-completed { background: #55efc4; color: #00b894; }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .info-label {
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+  }
+
+  .info-value {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.05rem;
+  }
+
+  .metric-card {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+  }
+
+  .metric-label {
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .metric-value {
+    color: #2c3e50;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+  }
+
+  .btn-primary {
+    background: #667eea;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #5568d3;
+    transform: translateY(-1px);
+  }
+
+  .btn-success {
+    background: #00b894;
+    color: white;
+  }
+
+  .btn-danger {
+    background: #e74c3c;
+    color: white;
+  }
+
+  .btn-block {
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
+
+  .activity-timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .activity-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+  }
+
+  .activity-item::before {
+    content: '';
+    position: absolute;
+    left: -1.85rem;
+    top: 0.5rem;
+    width: 12px;
+    height: 12px;
+    background: #667eea;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px #667eea;
+  }
+
+  .activity-item::after {
+    content: '';
+    position: absolute;
+    left: -1.47rem;
+    top: 1.2rem;
+    width: 2px;
+    height: calc(100% - 0.7rem);
+    background: #e0e0e0;
+  }
+
+  .activity-item:last-child::after {
+    display: none;
+  }
+
+  .activity-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+  }
+
+  .activity-type {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .activity-time {
+    color: #7f8c8d;
+    font-size: 0.85rem;
+  }
+
+  .activity-desc {
+    color: #555;
+    font-size: 0.9rem;
+  }
+
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal.active {
+    display: flex;
+  }
+
+  .modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #2ecc71;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transform: translateY(200px);
+    transition: transform 0.3s;
+    z-index: 2000;
+  }
+
+  .toast.show { transform: translateY(0); }
+  .toast.error { background: #e74c3c; }
+
+  @media (max-width: 968px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .info-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">🔍 Loan Appraiser Portal</div>
+  <div class="nav-right">
+    <a href="/appraiser/dashboard" class="nav-link">← Back to Dashboard</a>
+    <a href="/logout" class="nav-link">Logout</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="main-grid">
+    <div>
+      <!-- Application Details -->
+      <div class="section" id="appDetails">
+        <div class="section-header">
+          <h2>Application Details</h2>
+          <span class="status-badge" id="appStatus">Loading...</span>
+        </div>
+        <div id="detailsContent">Loading application details...</div>
+      </div>
+
+      <!-- Financial Metrics -->
+      <div class="section">
+        <h2 style="margin-bottom: 1.5rem;">Financial Metrics</h2>
+        <div class="info-grid" id="metricsGrid">
+          <div class="metric-card">
+            <div class="metric-label">Loan-to-Value Ratio</div>
+            <div class="metric-value" id="ltvRatio">-</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Debt-to-Income Ratio</div>
+            <div class="metric-value" id="dtiRatio">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audit Trail -->
+      <div class="section">
+        <h2 style="margin-bottom: 1.5rem;">Audit Trail</h2>
+        <div class="activity-timeline" id="auditTrail">
+          <p style="color: #7f8c8d;">Loading audit trail...</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <!-- Appraisal Actions -->
+      <div class="section">
+        <h2 style="margin-bottom: 1.5rem;">Appraisal Actions</h2>
+        <div id="actionsPanel">
+          <button class="btn btn-primary btn-block" id="btnStartAppraisal">
+            Start Appraisal
+          </button>
+          <button class="btn btn-primary btn-block" id="btnAddNote" disabled>
+            Add Note
+          </button>
+          <button class="btn btn-primary btn-block" id="btnRequestDocs" disabled>
+            Request Documents
+          </button>
+          <button class="btn btn-success btn-block" id="btnApprove" disabled>
+            ✓ Approve Application
+          </button>
+          <button class="btn btn-danger btn-block" id="btnReject" disabled>
+            ✗ Reject Application
+          </button>
+        </div>
+      </div>
+
+      <!-- Document Requests -->
+      <div class="section">
+        <h2 style="margin-bottom: 1.5rem;">Document Requests</h2>
+        <div id="documentRequests">
+          <p style="color: #7f8c8d; font-size: 0.9rem;">No document requests yet.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Note Modal -->
+<div class="modal" id="modalAddNote">
+  <div class="modal-content">
+    <div class="modal-header">Add Appraisal Note</div>
+    <div class="form-group">
+      <label>Note Type</label>
+      <select id="noteType">
+        <option value="note_added">General Note</option>
+        <option value="identity_verified">Identity Verified</option>
+        <option value="employment_verified">Employment Verified</option>
+        <option value="income_verified">Income Verified</option>
+        <option value="credit_reviewed">Credit History Reviewed</option>
+        <option value="collateral_assessed">Collateral Assessed</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Note</label>
+      <textarea id="noteText" placeholder="Enter your note..."></textarea>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="submitNote()">Save Note</button>
+      <button class="btn" style="background: #e0e0e0;" onclick="closeModal('modalAddNote')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Request Documents Modal -->
+<div class="modal" id="modalRequestDocs">
+  <div class="modal-content">
+    <div class="modal-header">Request Additional Documents</div>
+    <div class="form-group">
+      <label>Document Type</label>
+      <select id="docType">
+        <option value="ID Proof">ID Proof</option>
+        <option value="Income Statement">Income Statement</option>
+        <option value="Employment Letter">Employment Letter</option>
+        <option value="Bank Statement">Bank Statement</option>
+        <option value="Tax Return">Tax Return</option>
+        <option value="Property Papers">Property Papers</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Message to Applicant</label>
+      <textarea id="docMessage" placeholder="Explain why this document is needed..."></textarea>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="submitDocRequest()">Send Request</button>
+      <button class="btn" style="background: #e0e0e0;" onclick="closeModal('modalRequestDocs')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Complete Appraisal Modal -->
+<div class="modal" id="modalCompleteAppraisal">
+  <div class="modal-content">
+    <div class="modal-header" id="completeModalTitle">Complete Appraisal</div>
+    <div class="form-group">
+      <label>Decision</label>
+      <select id="validityFlag">
+        <option value="">Select decision...</option>
+        <option value="valid">Valid - Approve Application</option>
+        <option value="invalid">Invalid - Reject Application</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Appraisal Notes (Required)</label>
+      <textarea id="appraisalNotes" placeholder="Provide detailed reasoning for your decision..."></textarea>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="submitAppraisal()">Submit Decision</button>
+      <button class="btn" style="background: #e0e0e0;" onclick="closeModal('modalCompleteAppraisal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const appId = {{ app_id }};
+  let currentApplication = null;
+
+  async function loadApplication() {
+    try {
+      const res = await fetch(`/api/appraiser/application/${appId}`);
+      const data = await res.json();
+      
+      if (!data.success) throw new Error(data.message);
+      
+      currentApplication = data.application;
+      renderApplicationDetails(data.application);
+      renderAuditTrail(data.activities);
+      renderDocumentRequests(data.document_requests);
+      updateActionsPanel(data.application);
+      
+    } catch (error) {
+      console.error('Error loading application:', error);
+      showToast('Failed to load application details', 'error');
+    }
+  }
+
+  function renderApplicationDetails(app) {
+    document.getElementById('appStatus').className = `status-badge status-${app.appraisal_status}`;
+    document.getElementById('appStatus').textContent = formatStatus(app.appraisal_status);
+    
+    const detailsHTML = `
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Application ID</span>
+          <span class="info-value">#${app.id}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Applicant Name</span>
+          <span class="info-value">${app.applicant_name}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Email</span>
+          <span class="info-value">${app.email}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Phone</span>
+          <span class="info-value">${app.phone}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Loan Type</span>
+          <span class="info-value">${app.loan_type}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Loan Amount</span>
+          <span class="info-value">$${parseFloat(app.loan_amount).toLocaleString()}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Employment Status</span>
+          <span class="info-value">${app.employment_status}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Employer</span>
+          <span class="info-value">${app.employer_name || 'N/A'}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Monthly Income</span>
+          <span class="info-value">$${parseFloat(app.monthly_income).toLocaleString()}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Credit Score</span>
+          <span class="info-value">${app.credit_score || 'Not provided'}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Collateral Type</span>
+          <span class="info-value">${app.collateral_type || 'None'}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Collateral Value</span>
+          <span class="info-value">${app.collateral_value ? '$' + parseFloat(app.collateral_value).toLocaleString() : 'N/A'}</span>
+        </div>
+        <div class="info-item" style="grid-column: 1 / -1;">
+          <span class="info-label">Purpose</span>
+          <span class="info-value">${app.purpose || 'N/A'}</span>
+        </div>
+        <div class="info-item" style="grid-column: 1 / -1;">
+          <span class="info-label">Submitted At</span>
+          <span class="info-value">${formatDateTime(app.submitted_at)}</span>
+        </div>
+        ${app.documents ? `
+          <div class="info-item" style="grid-column: 1 / -1;">
+            <span class="info-label">Documents</span>
+            <span class="info-value">${app.documents}</span>
+          </div>
+        ` : ''}
+      </div>
+    `;
+    
+    document.getElementById('detailsContent').innerHTML = detailsHTML;
+    
+    // Update metrics
+    document.getElementById('ltvRatio').textContent = app.ltv_ratio ? 
+      `${parseFloat(app.ltv_ratio).toFixed(2)}%` : 'N/A';
+    document.getElementById('dtiRatio').textContent = app.dti_ratio ? 
+      `${parseFloat(app.dti_ratio).toFixed(2)}` : 'N/A';
+  }
+
+  function renderAuditTrail(activities) {
+    if (!activities || activities.length === 0) {
+      document.getElementById('auditTrail').innerHTML = 
+        '<p style="color: #7f8c8d;">No activities recorded yet.</p>';
+      return;
+    }
+    
+    const html = activities.map(act => `
+      <div class="activity-item">
+        <div class="activity-header">
+          <span class="activity-type">${formatStatus(act.activity_type)}</span>
+          <span class="activity-time">${formatDateTime(act.performed_at)}</span>
+        </div>
+        <div class="activity-desc">${act.description}</div>
+        <div style="color: #7f8c8d; font-size: 0.85rem; margin-top: 0.25rem;">
+          By: ${act.appraiser_name || 'System'}
+        </div>
+      </div>
+    `).join('');
+    
+    document.getElementById('auditTrail').innerHTML = html;
+  }
+
+  function renderDocumentRequests(requests) {
+    if (!requests || requests.length === 0) {
+      document.getElementById('documentRequests').innerHTML = 
+        '<p style="color: #7f8c8d; font-size: 0.9rem;">No document requests yet.</p>';
+      return;
+    }
+    
+    const html = requests.map(req => `
+      <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem;">
+        <div style="font-weight: 600; color: #2c3e50; margin-bottom: 0.5rem;">${req.document_type}</div>
+        <div style="font-size: 0.9rem; color: #555; margin-bottom: 0.5rem;">${req.request_message}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.85rem; color: #7f8c8d;">${formatDateTime(req.requested_at)}</span>
+          <span class="status-badge status-${req.status}" style="padding: 0.25rem 0.6rem; font-size: 0.8rem;">
+            ${formatStatus(req.status)}
+          </span>
+        </div>
+      </div>
+    `).join('');
+    
+    document.getElementById('documentRequests').innerHTML = html;
+  }
+
+  function updateActionsPanel(app) {
+    const btnStart = document.getElementById('btnStartAppraisal');
+    const btnAddNote = document.getElementById('btnAddNote');
+    const btnRequestDocs = document.getElementById('btnRequestDocs');
+    const btnApprove = document.getElementById('btnApprove');
+    const btnReject = document.getElementById('btnReject');
+    
+    if (app.appraisal_status === 'not_started') {
+      btnStart.disabled = false;
+      btnAddNote.disabled = true;
+      btnRequestDocs.disabled = true;
+      btnApprove.disabled = true;
+      btnReject.disabled = true;
+    } else if (app.appraisal_status === 'in_progress') {
+      btnStart.style.display = 'none';
+      btnAddNote.disabled = false;
+      btnRequestDocs.disabled = false;
+      btnApprove.disabled = false;
+      btnReject.disabled = false;
+    } else {
+      btnStart.style.display = 'none';
+      btnAddNote.disabled = true;
+      btnRequestDocs.disabled = true;
+      btnApprove.disabled = true;
+      btnReject.disabled = true;
+    }
+  }
+
+  // Event Listeners
+  document.getElementById('btnStartAppraisal').addEventListener('click', async () => {
+    try {
+      const res = await fetch(`/api/appraiser/start-appraisal/${appId}`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        showToast('Appraisal started successfully', 'success');
+        loadApplication();
+      } else {
+        showToast(data.message, 'error');
+      }
+    } catch (error) {
+      showToast('Failed to start appraisal', 'error');
+    }
+  });
+
+  document.getElementById('btnAddNote').addEventListener('click', () => {
+    openModal('modalAddNote');
+  });
+
+  document.getElementById('btnRequestDocs').addEventListener('click', () => {
+    openModal('modalRequestDocs');
+  });
+
+  document.getElementById('btnApprove').addEventListener('click', () => {
+    document.getElementById('completeModalTitle').textContent = 'Approve Application';
+    document.getElementById('validityFlag').value = 'valid';
+    openModal('modalCompleteAppraisal');
+  });
+
+  document.getElementById('btnReject').addEventListener('click', () => {
+    document.getElementById('completeModalTitle').textContent = 'Reject Application';
+    document.getElementById('validityFlag').value = 'invalid';
+    openModal('modalCompleteAppraisal');
+  });
+
+  async function submitNote() {
+    const noteType = document.getElementById('noteType').value;
+    const noteText = document.getElementById('noteText').value.trim();
+    
+    if (!noteText) {
+      showToast('Please enter a note', 'error');
+      return;
+    }
+    
+    try {
+      const res = await fetch(`/api/appraiser/add-note/${appId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note: noteText, activity_type: noteType })
+      });
+      
+      const data = await res.json();
+      if (data.success) {
+        showToast('Note added successfully', 'success');
+        closeModal('modalAddNote');
+        document.getElementById('noteText').value = '';
+        loadApplication();
+      } else {
+        showToast(data.message, 'error');
+      }
+    } catch (error) {
+      showToast('Failed to add note', 'error');
+    }
+  }
+
+  async function submitDocRequest() {
+    const docType = document.getElementById('docType').value;
+    const docMessage = document.getElementById('docMessage').value.trim();
+    
+    if (!docMessage) {
+      showToast('Please enter a message', 'error');
+      return;
+    }
+    
+    try {
+      const res = await fetch(`/api/appraiser/request-documents/${appId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ document_type: docType, message: docMessage })
+      });
+      
+      const data = await res.json();
+      if (data.success) {
+        showToast('Document request sent successfully', 'success');
+        closeModal('modalRequestDocs');
+        document.getElementById('docMessage').value = '';
+        loadApplication();
+      } else {
+        showToast(data.message, 'error');
+      }
+    } catch (error) {
+      showToast('Failed to send document request', 'error');
+    }
+  }
+
+  async function submitAppraisal() {
+    const validityFlag = document.getElementById('validityFlag').value;
+    const notes = document.getElementById('appraisalNotes').value.trim();
+    
+    if (!validityFlag || !notes) {
+      showToast('Please select a decision and provide notes', 'error');
+      return;
+    }
+    
+    try {
+      const res = await fetch(`/api/appraiser/complete-appraisal/${appId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ validity_flag: validityFlag, notes: notes })
+      });
+      
+      const data = await res.json();
+      if (data.success) {
+        showToast('Appraisal completed successfully', 'success');
+        closeModal('modalCompleteAppraisal');
+        document.getElementById('appraisalNotes').value = '';
+        setTimeout(() => window.location.href = '/appraiser/dashboard', 2000);
+      } else {
+        showToast(data.message, 'error');
+      }
+    } catch (error) {
+      showToast('Failed to complete appraisal', 'error');
+    }
+  }
+
+  function openModal(modalId) {
+    document.getElementById(modalId).classList.add('active');
+  }
+
+  function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+  }
+
+  function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = `toast ${type} show`;
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+
+  function formatStatus(status) {
+    return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  }
+
+  function formatDateTime(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  loadApplication();
+</script>
+
+</body>
+</html>

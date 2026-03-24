@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appraiser Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f5f7fa;
+    min-height: 100vh;
+  }
+
+  nav {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav-logo { 
+    font-size: 1.5rem; 
+    font-weight: 700; 
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .nav-right { display: flex; gap: 1rem; align-items: center; }
+  
+  .user-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+  }
+  
+  .btn-logout {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .header {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+
+  h1 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+  }
+
+  .subtitle { color: #7f8c8d; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    text-align: center;
+  }
+
+  .stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+
+  .stat-label {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+  }
+
+  .filters {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-group {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .filter-label {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  select, input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+  }
+
+  .applications-table {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead {
+    background: #2c3e50;
+    color: white;
+  }
+
+  th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+
+  tbody tr:hover {
+    background: #f8f9fa;
+  }
+
+  td {
+    padding: 1rem;
+  }
+
+  .status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+  }
+
+  .status-pending { background: #ffeaa7; color: #d63031; }
+  .status-in_progress { background: #74b9ff; color: #0984e3; }
+  .status-approved { background: #55efc4; color: #00b894; }
+  .status-rejected { background: #ff7675; color: #d63031; }
+  .status-not_started { background: #dfe6e9; color: #636e72; }
+  .status-completed { background: #55efc4; color: #00b894; }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #7f8c8d;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 3rem;
+    color: #7f8c8d;
+  }
+
+  @media (max-width: 768px) {
+    nav { flex-direction: column; gap: 1rem; }
+    .applications-table { overflow-x: auto; }
+    table { min-width: 800px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <span>🔍</span>
+    <span>Loan Appraiser Portal</span>
+  </div>
+  <div class="nav-right">
+    <div class="user-badge">👤 {{ user_name }} (Appraiser)</div>
+    <a href="/logout" class="btn-logout">Logout</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="header">
+    <h1>Loan Applications Queue</h1>
+    <p class="subtitle">Review and appraise loan applications submitted by applicants</p>
+  </div>
+
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-value" id="totalApps">-</div>
+      <div class="stat-label">Total Applications</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-value" id="pendingApps">-</div>
+      <div class="stat-label">Pending Review</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🔄</div>
+      <div class="stat-value" id="inProgressApps">-</div>
+      <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value" id="completedApps">-</div>
+      <div class="stat-label">Completed</div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label class="filter-label">Status</label>
+      <select id="filterStatus" onchange="applyFilters()">
+        <option value="">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="in_progress">In Progress</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Appraisal Status</label>
+      <select id="filterAppraisal" onchange="applyFilters()">
+        <option value="">All</option>
+        <option value="not_started">Not Started</option>
+        <option value="in_progress">In Progress</option>
+        <option value="completed">Completed</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Loan Type</label>
+      <select id="filterLoanType" onchange="applyFilters()">
+        <option value="">All Types</option>
+        <option value="Personal">Personal</option>
+        <option value="Home">Home</option>
+        <option value="Auto">Auto</option>
+        <option value="Business">Business</option>
+        <option value="Education">Education</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Search</label>
+      <input type="text" id="searchInput" placeholder="Search by name, email..." oninput="applyFilters()">
+    </div>
+  </div>
+
+  <div class="applications-table">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Applicant</th>
+          <th>Loan Type</th>
+          <th>Amount</th>
+          <th>Submitted</th>
+          <th>Status</th>
+          <th>Appraisal</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="applicationsBody">
+        <tr>
+          <td colspan="8" class="loading">Loading applications...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  let allApplications = [];
+  
+  async function loadApplications() {
+    try {
+      const res = await fetch('/api/appraiser/applications');
+      const data = await res.json();
+      
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to load applications');
+      }
+      
+      allApplications = data.applications;
+      updateStats();
+      applyFilters();
+      
+    } catch (error) {
+      console.error('Error loading applications:', error);
+      document.getElementById('applicationsBody').innerHTML = `
+        <tr><td colspan="8" class="empty-state">Failed to load applications. Please refresh the page.</td></tr>
+      `;
+    }
+  }
+  
+  function updateStats() {
+    document.getElementById('totalApps').textContent = allApplications.length;
+    document.getElementById('pendingApps').textContent = 
+      allApplications.filter(a => a.appraisal_status === 'not_started').length;
+    document.getElementById('inProgressApps').textContent = 
+      allApplications.filter(a => a.appraisal_status === 'in_progress').length;
+    document.getElementById('completedApps').textContent = 
+      allApplications.filter(a => a.appraisal_status === 'completed').length;
+  }
+  
+  function applyFilters() {
+    const statusFilter = document.getElementById('filterStatus').value;
+    const appraisalFilter = document.getElementById('filterAppraisal').value;
+    const loanTypeFilter = document.getElementById('filterLoanType').value;
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    
+    let filtered = allApplications.filter(app => {
+      if (statusFilter && app.status !== statusFilter) return false;
+      if (appraisalFilter && app.appraisal_status !== appraisalFilter) return false;
+      if (loanTypeFilter && app.loan_type !== loanTypeFilter) return false;
+      if (searchTerm && 
+          !app.applicant_name.toLowerCase().includes(searchTerm) &&
+          !app.email.toLowerCase().includes(searchTerm)) return false;
+      return true;
+    });
+    
+    renderApplications(filtered);
+  }
+  
+  function renderApplications(apps) {
+    const tbody = document.getElementById('applicationsBody');
+    
+    if (apps.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No applications found matching your filters.</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = apps.map(app => `
+      <tr onclick="viewApplication(${app.id})">
+        <td><strong>#${app.id}</strong></td>
+        <td>
+          <div style="font-weight: 600;">${app.applicant_name}</div>
+          <div style="font-size: 0.85rem; color: #7f8c8d;">${app.email}</div>
+        </td>
+        <td>${app.loan_type}</td>
+        <td><strong>$${parseFloat(app.loan_amount).toLocaleString()}</strong></td>
+        <td>${formatDate(app.submitted_at)}</td>
+        <td><span class="status-badge status-${app.status}">${formatStatus(app.status)}</span></td>
+        <td><span class="status-badge status-${app.appraisal_status}">${formatStatus(app.appraisal_status)}</span></td>
+        <td>
+          <button onclick="event.stopPropagation(); viewApplication(${app.id})" 
+                  style="background: #667eea; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 500;">
+            Review
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+  
+  function viewApplication(appId) {
+    window.location.href = `/appraiser/application/${appId}`;
+  }
+  
+  function formatStatus(status) {
+    return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  }
+  
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+  
+  loadApplications();
+</script>
+
+</body>
+</html>
