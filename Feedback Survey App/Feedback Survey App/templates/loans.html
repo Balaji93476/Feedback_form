@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loan Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d14;
+    --surface: #16161f;
+    --surface2: #1e1e2a;
+    --border: #2a2a3a;
+    --accent: #ff6b35;
+    --accent2: #4ecdc4;
+    --accent3: #a78bfa;
+    --text: #e8e6f0;
+    --muted: #6b6880;
+    --success: #06d6a0;
+    --warning: #ffd166;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.4;
+    z-index: 0;
+  }
+
+  .page { position: relative; z-index: 1; }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(13,13,20,0.88);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .logo span { color: var(--accent); }
+
+  .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+
+  .user-avatar {
+    width: 22px; height: 22px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+  }
+
+  .btn-nav {
+    padding: 0.4rem 1rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-nav:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .btn-logout {
+    padding: 0.4rem 1rem;
+    background: rgba(255,71,87,0.1);
+    border: 1px solid rgba(255,71,87,0.2);
+    border-radius: 8px;
+    color: #ff4757;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-logout:hover { background: rgba(255,71,87,0.2); }
+
+  main { padding: 2.5rem; max-width: 1600px; margin: 0 auto; }
+
+  .page-title { margin-bottom: 2rem; }
+  .page-title p {
+    font-size: 0.78rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+  }
+  .page-title h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.03em;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+
+  .tab {
+    padding: 0.5rem 1.2rem;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .tab:hover { color: var(--text); background: var(--surface2); }
+  .tab.active { color: var(--accent); background: rgba(255,107,53,0.1); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 0.7rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent2);
+  }
+
+  .btn {
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-primary:hover { background: #ff8555; }
+
+  .btn-success {
+    background: var(--success);
+    color: white;
+  }
+  .btn-success:hover { background: #07e6b0; }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--accent2); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  tbody tr:last-child { border: none; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td {
+    padding: 0.9rem 1rem;
+    font-size: 0.88rem;
+    color: var(--text);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.7rem;
+    border-radius: 50px;
+    font-size: 0.72rem;
+    font-weight: 500;
+  }
+
+  .badge-pending {
+    background: rgba(255,209,102,0.15);
+    color: var(--warning);
+  }
+
+  .badge-approved {
+    background: rgba(6,214,160,0.15);
+    color: var(--success);
+  }
+
+  .badge-rejected {
+    background: rgba(255,107,53,0.15);
+    color: var(--accent);
+  }
+
+  .message {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .message-success {
+    background: rgba(6,214,160,0.1);
+    border: 1px solid rgba(6,214,160,0.3);
+    color: var(--success);
+  }
+
+  .message-error {
+    background: rgba(255,107,53,0.1);
+    border: 1px solid rgba(255,107,53,0.3);
+    color: var(--accent);
+  }
+
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 600px) {
+    nav { padding: 1rem; }
+    main { padding: 1.5rem 1rem; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <nav>
+    <div class="logo">Loan<span>Manager</span></div>
+    <div class="nav-right">
+      <div class="user-chip">
+        <div class="user-avatar">{{ user_name[0].upper() }}</div>
+        <span class="user-name">{{ user_name }}</span>
+      </div>
+      <a href="/vouchers" class="btn-nav">💰 Vouchers</a>
+      <a href="/dashboard" class="btn-nav">📊 Feedback</a>
+      <a href="/logout" class="btn-logout">Sign Out</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-title">
+      <p>Finance Management</p>
+      <h1>Loan Applications</h1>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('create')">➕ New Application</button>
+      <button class="tab" onclick="switchTab('list')">📋 All Loans</button>
+      <button class="tab" onclick="switchTab('borrowers')">👤 Borrowers</button>
+      <button class="tab" onclick="switchTab('agents')">🏦 Agents</button>
+    </div>
+
+    <div id="createTab" class="tab-content active">
+      <div id="createMessage"></div>
+      
+      <div class="card">
+        <div class="card-title">➕ Create New Loan Application</div>
+        
+        <form id="loanForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Borrower *</label>
+              <select id="borrowerId" required>
+                <option value="">Select Borrower</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label>Agent *</label>
+              <select id="agentId" required>
+                <option value="">Select Agent</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label>Loan Amount ($) *</label>
+              <input type="number" id="loanAmount" step="0.01" min="0" required>
+            </div>
+            
+            <div class="form-group">
+              <label>Loan Type *</label>
+              <select id="loanType" required>
+                <option value="">Select Type</option>
+                <option value="Personal Loan">Personal Loan</option>
+                <option value="Business Loan">Business Loan</option>
+                <option value="Home Loan">Home Loan</option>
+                <option value="Auto Loan">Auto Loan</option>
+                <option value="Education Loan">Education Loan</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label>Loan Term (months) *</label>
+              <input type="number" id="loanTerm" min="1" required>
+            </div>
+            
+            <div class="form-group">
+              <label>Interest Rate (%) *</label>
+              <input type="number" id="interestRate" step="0.01" min="0" max="100" required>
+            </div>
+            
+            <div class="form-group">
+              <label>Payment Method *</label>
+              <select id="paymentMethod" required>
+                <option value="">Select Method</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Cheque">Cheque</option>
+                <option value="Cash">Cash</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label>Applicable Fees ($)</label>
+              <input type="number" id="applicableFees" step="0.01" min="0" value="0">
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Create Loan Application</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-title">👤 Add New Borrower</div>
+        <form id="borrowerForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Name *</label>
+              <input type="text" id="borrowerName" required>
+            </div>
+            <div class="form-group">
+              <label>Contact Details *</label>
+              <input type="text" id="borrowerContact" required>
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="borrowerEmail">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-secondary" style="margin-top: 1rem;">Add Borrower</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🏦 Add New Agent</div>
+        <form id="agentForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Name *</label>
+              <input type="text" id="agentName" required>
+            </div>
+            <div class="form-group">
+              <label>Bank Account Number *</label>
+              <input type="text" id="agentBankAccount" required>
+            </div>
+            <div class="form-group">
+              <label>Bank Name *</label>
+              <input type="text" id="agentBankName" required>
+            </div>
+            <div class="form-group">
+              <label>Branch Details *</label>
+              <input type="text" id="agentBranchDetails" required>
+            </div>
+            <div class="form-group">
+              <label>Contact Details</label>
+              <input type="text" id="agentContact">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-secondary" style="margin-top: 1rem;">Add Agent</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="listTab" class="tab-content">
+      <div class="card">
+        <div class="card-title">📋 All Loan Applications</div>
+        <div id="loansLoading" class="loading">Loading loans...</div>
+        <div id="loansTable" style="display:none; overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Loan ID</th>
+                <th>Borrower</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Term</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="loansTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="borrowersTab" class="tab-content">
+      <div class="card">
+        <div class="card-title">👤 All Borrowers</div>
+        <div id="borrowersLoading" class="loading">Loading borrowers...</div>
+        <div id="borrowersTable" style="display:none; overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Email</th>
+                <th>Account Number</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody id="borrowersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="agentsTab" class="tab-content">
+      <div class="card">
+        <div class="card-title">🏦 All Agents</div>
+        <div id="agentsLoading" class="loading">Loading agents...</div>
+        <div id="agentsTable" style="display:none; overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Bank Account</th>
+                <th>Bank Name</th>
+                <th>Branch</th>
+                <th>Contact</th>
+              </tr>
+            </thead>
+            <tbody id="agentsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    event.target.classList.add('active');
+    document.getElementById(tabName + 'Tab').classList.add('active');
+    
+    if (tabName === 'list') loadLoans();
+    if (tabName === 'borrowers') loadBorrowers();
+    if (tabName === 'agents') loadAgents();
+  }
+
+  function showMessage(containerId, message, isError = false) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = `<div class="message ${isError ? 'message-error' : 'message-success'}">${message}</div>`;
+    setTimeout(() => container.innerHTML = '', 5000);
+  }
+
+  async function loadBorrowersAndAgents() {
+    try {
+      const [borrowersRes, agentsRes] = await Promise.all([
+        fetch('/api/borrowers'),
+        fetch('/api/agents')
+      ]);
+      
+      const borrowersData = await borrowersRes.json();
+      const agentsData = await agentsRes.json();
+      
+      const borrowerSelect = document.getElementById('borrowerId');
+      const agentSelect = document.getElementById('agentId');
+      
+      borrowerSelect.innerHTML = '<option value="">Select Borrower</option>' +
+        borrowersData.borrowers.map(b => `<option value="${b.id}">${b.name} (${b.loan_account_number})</option>`).join('');
+      
+      agentSelect.innerHTML = '<option value="">Select Agent</option>' +
+        agentsData.agents.map(a => `<option value="${a.id}">${a.name} - ${a.bank_name}</option>`).join('');
+    } catch (err) {
+      console.error('Failed to load borrowers/agents:', err);
+    }
+  }
+
+  document.getElementById('borrowerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const data = {
+      name: document.getElementById('borrowerName').value,
+      contact_details: document.getElementById('borrowerContact').value,
+      email: document.getElementById('borrowerEmail').value
+    };
+    
+    try {
+      const res = await fetch('/api/borrowers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      
+      const result = await res.json();
+      
+      if (result.success) {
+        showMessage('createMessage', '✓ Borrower added successfully!');
+        e.target.reset();
+        loadBorrowersAndAgents();
+      } else {
+        showMessage('createMessage', '✗ ' + result.message, true);
+      }
+    } catch (err) {
+      showMessage('createMessage', '✗ Failed to add borrower', true);
+    }
+  });
+
+  document.getElementById('agentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const data = {
+      name: document.getElementById('agentName').value,
+      bank_account_number: document.getElementById('agentBankAccount').value,
+      bank_name: document.getElementById('agentBankName').value,
+      branch_details: document.getElementById('agentBranchDetails').value,
+      contact_details: document.getElementById('agentContact').value
+    };
+    
+    try {
+      const res = await fetch('/api/agents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      
+      const result = await res.json();
+      
+      if (result.success) {
+        showMessage('createMessage', '✓ Agent added successfully!');
+        e.target.reset();
+        loadBorrowersAndAgents();
+      } else {
+        showMessage('createMessage', '✗ ' + result.message, true);
+      }
+    } catch (err) {
+      showMessage('createMessage', '✗ Failed to add agent', true);
+    }
+  });
+
+  document.getElementById('loanForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const data = {
+      borrower_id: document.getElementById('borrowerId').value,
+      agent_id: document.getElementById('agentId').value,
+      loan_amount: document.getElementById('loanAmount').value,
+      loan_type: document.getElementById('loanType').value,
+      loan_term: document.getElementById('loanTerm').value,
+      interest_rate: document.getElementById('interestRate').value,
+      payment_method: document.getElementById('paymentMethod').value,
+      applicable_fees: document.getElementById('applicableFees').value
+    };
+    
+    try {
+      const res = await fetch('/api/loans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      
+      const result = await res.json();
+      
+      if (result.success) {
+        showMessage('createMessage', '✓ Loan application created successfully!');
+        e.target.reset();
+      } else {
+        showMessage('createMessage', '✗ ' + result.message, true);
+      }
+    } catch (err) {
+      showMessage('createMessage', '✗ Failed to create loan application', true);
+    }
+  });
+
+  async function loadLoans() {
+    try {
+      const res = await fetch('/api/loans');
+      const data = await res.json();
+      
+      document.getElementById('loansLoading').style.display = 'none';
+      document.getElementById('loansTable').style.display = 'block';
+      
+      const tbody = document.getElementById('loansTableBody');
+      tbody.innerHTML = data.loans.map(loan => `
+        <tr>
+          <td>${loan.loan_id}</td>
+          <td>${loan.borrower_name}</td>
+          <td>$${parseFloat(loan.loan_amount).toFixed(2)}</td>
+          <td>${loan.loan_type}</td>
+          <td>${loan.loan_term} mo</td>
+          <td><span class="badge badge-${loan.status}">${loan.status}</span></td>
+          <td>${loan.created_at?.split(' ')[0] || '—'}</td>
+          <td>
+            ${loan.status === 'pending' 
+              ? `<button class="btn btn-success" style="padding: 0.3rem 0.8rem; font-size: 0.8rem;" onclick="approveLoan(${loan.id})">Approve</button>`
+              : loan.status === 'approved' 
+                ? '<span style="color: var(--success);">✓ Approved</span>'
+                : '—'
+            }
+          </td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      document.getElementById('loansLoading').innerHTML = '⚠️ Failed to load loans';
+    }
+  }
+
+  async function approveLoan(loanId) {
+    if (!confirm('Approve this loan and generate payment voucher?')) return;
+    
+    try {
+      const res = await fetch(`/api/loans/${loanId}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      const result = await res.json();
+      
+      if (result.success) {
+        alert('✓ Loan approved and payment voucher generated!\nVoucher Reference: ' + result.voucher_reference_number);
+        loadLoans();
+      } else {
+        alert('✗ ' + result.message);
+      }
+    } catch (err) {
+      alert('✗ Failed to approve loan');
+    }
+  }
+
+  async function loadBorrowers() {
+    try {
+      const res = await fetch('/api/borrowers');
+      const data = await res.json();
+      
+      document.getElementById('borrowersLoading').style.display = 'none';
+      document.getElementById('borrowersTable').style.display = 'block';
+      
+      const tbody = document.getElementById('borrowersTableBody');
+      tbody.innerHTML = data.borrowers.map(b => `
+        <tr>
+          <td>${b.id}</td>
+          <td>${b.name}</td>
+          <td>${b.contact_details}</td>
+          <td>${b.email || '—'}</td>
+          <td>${b.loan_account_number}</td>
+          <td>${b.created_at?.split(' ')[0] || '—'}</td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      document.getElementById('borrowersLoading').innerHTML = '⚠️ Failed to load borrowers';
+    }
+  }
+
+  async function loadAgents() {
+    try {
+      const res = await fetch('/api/agents');
+      const data = await res.json();
+      
+      document.getElementById('agentsLoading').style.display = 'none';
+      document.getElementById('agentsTable').style.display = 'block';
+      
+      const tbody = document.getElementById('agentsTableBody');
+      tbody.innerHTML = data.agents.map(a => `
+        <tr>
+          <td>${a.id}</td>
+          <td>${a.name}</td>
+          <td>${a.bank_account_number}</td>
+          <td>${a.bank_name}</td>
+          <td>${a.branch_details}</td>
+          <td>${a.contact_details || '—'}</td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      document.getElementById('agentsLoading').innerHTML = '⚠️ Failed to load agents';
+    }
+  }
+
+  loadBorrowersAndAgents();
+</script>
+</body>
+</html>

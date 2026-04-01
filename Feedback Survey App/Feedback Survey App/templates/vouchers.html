@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment Vouchers</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d14;
+    --surface: #16161f;
+    --surface2: #1e1e2a;
+    --border: #2a2a3a;
+    --accent: #ff6b35;
+    --accent2: #4ecdc4;
+    --accent3: #a78bfa;
+    --text: #e8e6f0;
+    --muted: #6b6880;
+    --success: #06d6a0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.4;
+    z-index: 0;
+  }
+
+  .page { position: relative; z-index: 1; }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(13,13,20,0.88);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .logo span { color: var(--accent); }
+
+  .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+
+  .user-avatar {
+    width: 22px; height: 22px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+  }
+
+  .btn-nav {
+    padding: 0.4rem 1rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-nav:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .btn-logout {
+    padding: 0.4rem 1rem;
+    background: rgba(255,71,87,0.1);
+    border: 1px solid rgba(255,71,87,0.2);
+    border-radius: 8px;
+    color: #ff4757;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-logout:hover { background: rgba(255,71,87,0.2); }
+
+  main { padding: 2.5rem; max-width: 1600px; margin: 0 auto; }
+
+  .page-title { margin-bottom: 2rem; }
+  .page-title p {
+    font-size: 0.78rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+  }
+  .page-title h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.03em;
+  }
+
+  .vouchers-grid {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .voucher-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: border-color 0.2s;
+  }
+  .voucher-card:hover { border-color: var(--accent2); }
+
+  .voucher-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .voucher-ref {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .voucher-date {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .voucher-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .voucher-section {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.7rem;
+  }
+
+  .info-label {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .info-value {
+    font-size: 0.85rem;
+    color: var(--text);
+    font-weight: 500;
+    text-align: right;
+  }
+
+  .amount-display {
+    background: linear-gradient(135deg, rgba(6,214,160,0.1), rgba(78,205,196,0.1));
+    border: 1px solid rgba(6,214,160,0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+
+  .amount-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .amount-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--success);
+  }
+
+  .loading {
+    text-align: center;
+    padding: 3rem;
+    color: var(--muted);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem;
+    color: var(--muted);
+  }
+  .empty-state .icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .btn-print {
+    padding: 0.6rem 1.2rem;
+    background: var(--accent2);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-print:hover { background: #5eddd4; }
+
+  @media (max-width: 600px) {
+    nav { padding: 1rem; }
+    main { padding: 1.5rem 1rem; }
+    .voucher-sections { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    body { background: white; color: black; }
+    .page::before { display: none; }
+    nav, .btn-print { display: none; }
+    .voucher-card { border: 2px solid #000; page-break-inside: avoid; }
+    .voucher-section { background: #f5f5f5; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <nav>
+    <div class="logo">Payment<span>Vouchers</span></div>
+    <div class="nav-right">
+      <div class="user-chip">
+        <div class="user-avatar">{{ user_name[0].upper() }}</div>
+        <span class="user-name">{{ user_name }}</span>
+      </div>
+      <a href="/loans" class="btn-nav">📄 Loans</a>
+      <a href="/dashboard" class="btn-nav">📊 Dashboard</a>
+      <a href="/logout" class="btn-logout">Sign Out</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-title">
+      <p>Finance Department</p>
+      <h1>Payment Vouchers</h1>
+    </div>
+
+    <div id="loading" class="loading">Loading payment vouchers...</div>
+    <div id="emptyState" class="empty-state" style="display:none;">
+      <div class="icon">💰</div>
+      <p>No payment vouchers yet. <a href="/loans" style="color:var(--accent)">Approve loans to generate vouchers.</a></p>
+    </div>
+
+    <div id="vouchersGrid" class="vouchers-grid"></div>
+  </main>
+</div>
+
+<script>
+  async function loadVouchers() {
+    try {
+      const res = await fetch('/api/vouchers');
+      const data = await res.json();
+      
+      document.getElementById('loading').style.display = 'none';
+      
+      if (data.vouchers.length === 0) {
+        document.getElementById('emptyState').style.display = 'block';
+        return;
+      }
+      
+      const grid = document.getElementById('vouchersGrid');
+      grid.innerHTML = data.vouchers.map(v => `
+        <div class="voucher-card">
+          <div class="voucher-header">
+            <div>
+              <div class="voucher-ref">💰 ${v.voucher_reference_number}</div>
+              <div class="voucher-date">Generated: ${v.voucher_creation_timestamp}</div>
+            </div>
+            <button class="btn-print" onclick="printVoucher('${v.voucher_reference_number}')">🖨️ Print</button>
+          </div>
+          
+          <div class="voucher-sections">
+            <div class="voucher-section">
+              <div class="section-title">📋 Loan Details</div>
+              <div class="info-row">
+                <span class="info-label">Loan ID:</span>
+                <span class="info-value">${v.loan_id}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Loan Type:</span>
+                <span class="info-value">${v.loan_type}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Loan Amount:</span>
+                <span class="info-value">$${parseFloat(v.loan_amount).toFixed(2)}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Loan Term:</span>
+                <span class="info-value">${v.loan_term} months</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Interest Rate:</span>
+                <span class="info-value">${v.interest_rate}%</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Approval Date:</span>
+                <span class="info-value">${v.approval_date?.split(' ')[0] || '—'}</span>
+              </div>
+            </div>
+            
+            <div class="voucher-section">
+              <div class="section-title">👤 Borrower Information</div>
+              <div class="info-row">
+                <span class="info-label">Name:</span>
+                <span class="info-value">${v.borrower_name}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Account Number:</span>
+                <span class="info-value">${v.loan_account_number}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Contact:</span>
+                <span class="info-value">${v.borrower_contact}</span>
+              </div>
+              ${v.borrower_email ? `
+              <div class="info-row">
+                <span class="info-label">Email:</span>
+                <span class="info-value">${v.borrower_email}</span>
+              </div>
+              ` : ''}
+            </div>
+            
+            <div class="voucher-section">
+              <div class="section-title">🏦 Agent Information</div>
+              <div class="info-row">
+                <span class="info-label">Agent Name:</span>
+                <span class="info-value">${v.agent_name}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Bank Name:</span>
+                <span class="info-value">${v.bank_name}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Account Number:</span>
+                <span class="info-value">${v.bank_account_number}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Branch:</span>
+                <span class="info-value">${v.branch_details}</span>
+              </div>
+            </div>
+            
+            <div class="voucher-section">
+              <div class="section-title">💵 Payment Details</div>
+              <div class="info-row">
+                <span class="info-label">Payment Method:</span>
+                <span class="info-value">${v.payment_method}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Applicable Fees:</span>
+                <span class="info-value">$${parseFloat(v.applicable_fees || 0).toFixed(2)}</span>
+              </div>
+              <div class="amount-display">
+                <div class="amount-label">Disbursement Amount</div>
+                <div class="amount-value">$${parseFloat(v.disbursement_amount).toFixed(2)}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      
+    } catch (err) {
+      document.getElementById('loading').innerHTML = '⚠️ Failed to load payment vouchers';
+      console.error(err);
+    }
+  }
+
+  function printVoucher(voucherRef) {
+    window.print();
+  }
+
+  loadVouchers();
+</script>
+</body>
+</html>
